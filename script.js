@@ -16,27 +16,32 @@ const svg = d3.select(".chart").append("svg")
 
 // CHART UPDATE FUNCTION -------------------
 function update(data, type) {
+    // change the measure dynamically:
+    //  d[type] where type is either "stores" or "revenue"
     const xScale = d3
         .scaleBand()
-        .domain(d3.extent(data.map(d => d.company)))
+        .domain(d3.max(data.map(d => d.company)))
         .rangeRound([0, width])
         .paddingInner(0.1);
 
     const yScale = d3
         .scaleLinear()
-        .domain(d3.extent(data.map(d => d[type])))
+        .domain(d3.extent(data.map(d => d.stores)))
         .range([height, 0]);
 
+    // manually update axes and axis title
     // create axes and axis title containers
     svg.append('g')
         .attr('class', 'axis y-axis')
-        .call(d3.axisLeft(yScale));
+        .call(d3.axisLeft(yScale).ticks(5, "s"));
     svg.append('g')
         .attr('class', 'axis x-axis')
         .attr("transform", "translate(0," + height + ")")
-        .call(d3.axisBottom(xScale).ticks(5, "s"));
+        .call(d3.axisBottom(xScale));
     svg.append("text")
         .attr("class", "y-axis-title")
+        .attr('x', width - 50)
+        .attr('y', 450)
         .text(type);
 
     data.sort();
@@ -45,60 +50,38 @@ function update(data, type) {
         data.reverse();
     };
 	// update domains
-    // xScale.domain(data.map(d => d.company));
-    // yScale.domain(data.map(d => d.type));
+    xScale.domain(data.map(d => d.company));
+    yScale.domain(data.map(d => d.stores));
 
     // update bars
-    const bars = svg.selectAll('.bar')
+    const bars = svg
+        .selectAll('.rect')
         .data(data)
         .enter()
         .append('rect')
-        .attr("x", function(d) { return xScale(d.Company); })
-        .attr("y", function(d) { return yScale(d[type]); })
+        .attr("x", function(d) { return xScale(d.company); })
+        .attr("y", function(d) { return height - ((1/20) * d.stores); })
+        .attr("height", function(d) { return  ((1/20)* d.stores); })
         .attr("width", xScale.bandwidth())
-        .attr("height", function(d) { return height - yScale(d[type]); })
-        .attr("fill", "#69b3a2")
+        .attr("fill", "rgb(53, 102, 165)")
+        .text(function(d) { return d.company; })
+
+    svg.selectAll('.bar')
+        .data(data)
+        .attr('x', start)
+        .merge()
+        .transition()
+        .duration(1000)
+        .attr('x', end);
 
     // implement the enter-update-exist sequence
 
-	// manually update axes and axis title
-    // d3.max(data, d => d[type])
-    // const xScale = d3
-    //     .scaleBand()
-    //     .domain(d3.extent(data.map(d => d.company)))
-    //     .rangeRound([0, width])
-    //     .paddingInner(0.1);
-    // const yScale = d3
-    //     .scaleLinear()
-    //     .domain(d3.extent(data.map(d => d[type])))
-    //     .range([height, 0]);
-
-    // change the measure dynamically:
-    //  d[type] where type is either "stores" or "revenue"
-    // svg.append('g')
-    //     .attr('class', 'axis y-axis')
-    //     .call(d3.axisLeft(yScale));
-    // svg.append('g')
-    //     .attr('class', 'axis x-axis')
-    //     .attr("transform", "translate(0," + height + ")")
-    //     .call(d3.axisBottom(xScale).ticks(5, "s"));
-    // svg.append("text")
-    //     .attr("class", "y-axis-title")
-    //     .text(type);
-
     // add a data key function (use company name as a key)
-
-    // svg.selectAll('.bar')
-    // .data(data)
-    // .attr('x', start)
-    // .merge()
-    // .transition()
-    // .duration(1000)
-    // .attr('x', end);
 }
 
 // CHART UPDATES ---------------------------
 d3.csv('coffee-house-chains.csv', d3.autoType).then(data => {
+    console.log(data)
     update(data);
 });
 
