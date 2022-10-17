@@ -10,16 +10,28 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/milligram/1.4.1/milligram.css">
 
     <link rel="stylesheet" href="style.css" />
+    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/d3/6.1.1/d3.min.js"></script>
     <script defer src="script.js"></script>
     
   </head>
   <body>
-    <div class="chart">
+    <h1>Coffee House Chains</h1>
+    <p>A ranking of selected leading coffee house chains worldwide</p>
+    <div class="row">
+        <div class="col-sm">
         <label for="group-by">Group By</label>
+        </div>
+        <div class="column">
         <select id="group-by">
             <option value="stores">Stores worldwide</option>
             <option value="revenue">Revenue in billion U.S. dollars</option>
         </select>
+        </div>
+        <div class="column">
+        <button id="button">Sort</button>
+    </div>
+    </div>
+    <div class="chart">
     </div>
   </body>
 </html>
